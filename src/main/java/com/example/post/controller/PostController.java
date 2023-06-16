@@ -38,15 +38,15 @@ public class PostController {
     }
 
      //게시물 수정
-    @PutMapping("/postNumber/{id}/passWord/{password}")
-    public Post updatePost(@PathVariable Long id,@PathVariable Long password, @RequestBody PostRequestDto requestDto){
-        return postService.updatePost(id,password,requestDto);
+    @PutMapping("/postNumber/{id}")
+    public Post updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto){
+        return postService.updatePost(id,requestDto);
     }
 
     //게시물 삭제
-    @DeleteMapping("/postNumber/{id}/passWord/{password}")
-    public String deletePost(@PathVariable Long id,@PathVariable Long password){
-        return postService.deletePost(id,password);
+    @DeleteMapping("/postNumber/{id}")
+    public String deletePost(@PathVariable Long id,@RequestBody PostRequestDto requestDto){
+        return postService.deletePost(id,requestDto);
     }
 
 }

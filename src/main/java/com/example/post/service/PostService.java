@@ -47,11 +47,11 @@ public class PostService {
     }
     //게시글 수정
     @Transactional
-    public Post updatePost(Long id, Long password, PostRequestDto requestDto) {
+    public Post updatePost(Long id, PostRequestDto requestDto) {
 
         Post post = findPost(id);
 
-        if(password == post.getPassword()){
+        if(requestDto.getPassword() == post.getPassword()){
             post.update(requestDto);
             return post;
         }else {
@@ -60,10 +60,10 @@ public class PostService {
 
     }
 
-    public String deletePost(Long id, Long password) {
+    public String deletePost(Long id, PostRequestDto requestDto) {
         Post post = findPost(id);
 
-        if(password == post.getPassword()){
+        if(requestDto.getPassword() == post.getPassword()){
             postRepository.delete(post);
             return "Success Delete";
         }else {
