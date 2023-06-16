@@ -9,7 +9,11 @@ Use Case
 	그과정에서 RequestBody에 password도 있다면 password도 변경을 해야해서 입니다.
 	쿼리스트링으로 password를 받는다 해도 사용자에게 표시되기때문에 괜찮다고 생각했습니다.
 
-	삭제 API의 request는 @PathVariable를 사용해 쿼리스트링으로 게시물의 id 값과 password를 받았습니다. 	
+	삭제 API의 request는 @PathVariable를 사용해 쿼리스트링으로 게시물의 id 값과 password를 받았습니다. 
+	
+	- apiChange 브랜치로 내용변경 =
+	수정, 삭제 에서 쿼리스트링으로 password를 받던것을 변경해 더이상 password를 받지않고 @RequestBody를 이용해
+	password를 json 데이터로 받게 변경 하였습니다.
 
 2. 어떤 상황에 어떤 방식의 request를 써야하나요?
 	게시물을 수정, 삭제, 선택한 게시물을 조회 할땐 @PathVariable 를 사용해 어떠한 게시물으 선택했는지를 알려주도록
