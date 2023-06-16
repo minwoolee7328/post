@@ -14,6 +14,7 @@ Use Case
 	- apiChange 브랜치로 내용변경 =
 	수정, 삭제 에서 쿼리스트링으로 password를 받던것을 변경해 더이상 password를 받지않고 @RequestBody를 이용해
 	password를 json 데이터로 받게 변경 하였습니다.
+	수정한 api 명세서도 업로드 하였습니다.
 
 2. 어떤 상황에 어떤 방식의 request를 써야하나요?
 	게시물을 수정, 삭제, 선택한 게시물을 조회 할땐 @PathVariable 를 사용해 어떠한 게시물으 선택했는지를 알려주도록
@@ -35,3 +36,7 @@ Use Case
 API 명세서
 
 ![api](https://github.com/minwoolee7328/post/assets/131872877/affd915b-2632-4e4c-8163-ae22f8357c19)
+
+
+수정된 api
+![image](https://github.com/minwoolee7328/post/assets/131872877/74dee124-36df-4e18-b36d-8b7ef48f85a2)
