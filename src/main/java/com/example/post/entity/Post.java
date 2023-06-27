@@ -1,6 +1,7 @@
 package com.example.post.entity;
 
 import com.example.post.dto.PostRequestDto;
+import com.example.post.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
@@ -23,10 +24,14 @@ public class Post extends Timestamped{
     @Column(name = "content", nullable = false, length = 500)
     private String content;
 
+    @ManyToOne
+    @JoinColumn(name = "username")
+    private User user;
 
-    public Post(PostRequestDto postRequestDto) {
+    public Post(PostRequestDto postRequestDto,User user) {
         this.title = postRequestDto.getTitle();
         this.content = postRequestDto.getContent();
+        this.user = user;
     }
     @Transactional
     public void update(PostRequestDto RequestDto){

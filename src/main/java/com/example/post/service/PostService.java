@@ -4,10 +4,13 @@ import com.example.post.dto.PostRequestDto;
 import com.example.post.dto.PostResponseDto;
 import com.example.post.entity.Post;
 import com.example.post.repository.PostRepository;
+import com.example.post.user.dto.EnumDto;
+import com.example.post.user.entity.StatusEnum;
 import com.example.post.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,8 +25,10 @@ public class PostService {
         this.postRepository = postRepository;
     }
     //게시글 생성
-    public PostResponseDto createPost(PostRequestDto RequestDto) {
-        Post post = new Post(RequestDto);
+    public PostResponseDto createPost(PostRequestDto RequestDto, HttpServletRequest req) {
+        User user = (User) req.getAttribute("user");
+
+        Post post = new Post(RequestDto,user);
 
         postRepository.save(post);
 
@@ -34,9 +39,7 @@ public class PostService {
     }
 
     //전체글 조회
-    public List<PostResponseDto> getPosts(HttpServletRequest req){
-
-
+    public List<PostResponseDto> getPosts(){
         List<Post> getPost = postRepository.findAllByOrderByCreatedAtDesc();
         List<PostResponseDto> showPosts = new ArrayList<>();
         for(Post post : getPost){
@@ -55,27 +58,33 @@ public class PostService {
     }
     //게시글 수정
     @Transactional
-    public PostResponseDto updatePost(Long id, PostRequestDto requestDto) {
-
+    public PostResponseDto updatePost(Long id, PostRequestDto requestDto, HttpServletRequest req) {
+        User user = (User) req.getAttribute("user");
         Post post = findPost(id);
 
-//        if(requestDto.getPassword() == post.getPassword()){
-//            post.update(requestDto);
-//            return new PostResponseDto(post);
-//        }else {
-//            throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
-//        }
-        return null;
+        // 해당글의 작성자 와 토큰의 사용자가 같으면 업데이트
+        if(post.getUser().getUsername().equals(user.getUsername())){
+            post.update(requestDto);
+            return new PostResponseDto(post);
+        }else {
+            throw new IllegalArgumentException("작성자가 다릅니다.");
+        }
+
     }
 
-    public void deletePost(Long id, PostRequestDto requestDto) {
+    public ResponseEntity deletePost(Long id, PostRequestDto requestDto, HttpServletRequest req) {
+        User user = (User) req.getAttribute("user");
         Post post = findPost(id);
 
-//        if(requestDto.getPassword() == post.getPassword()){
-//            postRepository.delete(post);
-//        }else {
-//            throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
-//        }
+        // 해당글의 작성자 와 토큰의 사용자가 같으면 삭제
+        if(post.getUser().getUsername().equals(user.getUsername())){
+            postRepository.delete(post);
+            EnumDto SuccessEnumDto = new EnumDto(StatusEnum.OK,"삭제가 완료되었습니다.");
+            return new ResponseEntity(SuccessEnumDto, HttpStatus.OK);
+        }else {
+            EnumDto SuccessEnumDto = new EnumDto(StatusEnum.BAD_REQUEST,"작성자가 다릅니다.");
+            return new ResponseEntity(SuccessEnumDto, HttpStatus.BAD_REQUEST);
+        }
     }
 
     private Post findPost(Long id){
