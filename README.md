@@ -1,4 +1,6 @@
 ERD 설계
+
+
 ![image](https://github.com/minwoolee7328/post/assets/131872877/414be05e-9f9c-4913-bbbb-09984bdf99e1)
 
 API 명세서 작성
