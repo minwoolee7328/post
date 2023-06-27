@@ -3,11 +3,11 @@ package com.example.post.service;
 import com.example.post.dto.PostRequestDto;
 import com.example.post.dto.PostResponseDto;
 import com.example.post.entity.Post;
-import com.example.post.entity.PostFind;
 import com.example.post.repository.PostRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,44 +31,46 @@ public class PostService {
     }
 
     //전체글 조회
-    public List<PostFind> getPosts(){
-        return postRepository.findPosts();
+    public List<PostResponseDto> getPosts(){
+        List<Post> getPost = postRepository.findAllByOrderByCreatedAtDesc();
+        List<PostResponseDto> showPosts = new ArrayList<>();
+        for(Post post : getPost){
+            showPosts.add(new PostResponseDto(post));
+        }
+        return showPosts;
     }
 
     //선택한 게시글 조회
-    public List<PostFind> getChicePost(Long id) {
+    public PostResponseDto getPost(Long id) {
 
         Post post = findPost(id);
 
-        List<PostFind> postFinds = postRepository.findCoicePosts(id);
-
-        return postFinds;
+        return new PostResponseDto(post);
 
     }
     //게시글 수정
     @Transactional
-    public Post updatePost(Long id, PostRequestDto requestDto) {
+    public PostResponseDto updatePost(Long id, PostRequestDto requestDto) {
 
         Post post = findPost(id);
 
-        if(requestDto.getPassword() == post.getPassword()){
-            post.update(requestDto);
-            return post;
-        }else {
-            throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
-        }
-
+//        if(requestDto.getPassword() == post.getPassword()){
+//            post.update(requestDto);
+//            return new PostResponseDto(post);
+//        }else {
+//            throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
+//        }
+        return null;
     }
 
-    public String deletePost(Long id, PostRequestDto requestDto) {
+    public void deletePost(Long id, PostRequestDto requestDto) {
         Post post = findPost(id);
 
-        if(requestDto.getPassword() == post.getPassword()){
-            postRepository.delete(post);
-            return "Success Delete";
-        }else {
-            throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
-        }
+//        if(requestDto.getPassword() == post.getPassword()){
+//            postRepository.delete(post);
+//        }else {
+//            throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
+//        }
     }
 
     private Post findPost(Long id){
