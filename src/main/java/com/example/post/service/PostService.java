@@ -4,6 +4,9 @@ import com.example.post.dto.PostRequestDto;
 import com.example.post.dto.PostResponseDto;
 import com.example.post.entity.Post;
 import com.example.post.repository.PostRepository;
+import com.example.post.user.entity.User;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +34,9 @@ public class PostService {
     }
 
     //전체글 조회
-    public List<PostResponseDto> getPosts(){
+    public List<PostResponseDto> getPosts(HttpServletRequest req){
+
+
         List<Post> getPost = postRepository.findAllByOrderByCreatedAtDesc();
         List<PostResponseDto> showPosts = new ArrayList<>();
         for(Post post : getPost){

@@ -4,6 +4,8 @@ import com.example.post.dto.PostRequestDto;
 import com.example.post.dto.PostResponseDto;
 
 import com.example.post.service.PostService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +27,8 @@ public class PostController {
 
     //게시물 전체 조회 api
     @GetMapping("/posts")
-    public List<PostResponseDto> getPost (){
-        return postService.getPosts();
+    public List<PostResponseDto> getPost (HttpServletRequest req){
+        return postService.getPosts(req);
     }
 
     //선택한 게시물 조회 api

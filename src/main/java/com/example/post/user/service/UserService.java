@@ -2,11 +2,14 @@ package com.example.post.user.service;
 
 
 
+import com.example.post.jwt.JwtUtil;
 import com.example.post.user.dto.EnumDto;
-import com.example.post.user.dto.UserRequestDto;
+import com.example.post.user.dto.LoginRequestDto;
+import com.example.post.user.dto.SignupRequestDto;
 import com.example.post.user.entity.StatusEnum;
 import com.example.post.user.entity.User;
 import com.example.post.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,13 +26,15 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    private final JwtUtil jwtUtil;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
-    public ResponseEntity UserSignUp(UserRequestDto requestDto, BindingResult bindingResult) {
-
+    public ResponseEntity UserSignUp(SignupRequestDto requestDto, BindingResult bindingResult) {
         // Validation 예외처리
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
         if(fieldErrors.size() > 0) {
@@ -43,6 +48,7 @@ public class UserService {
         String password = passwordEncoder.encode(requestDto.getPassword());
 
         Optional<User> checkUsername = userRepository.findByUsername(username);
+
         if (checkUsername.isPresent()) {
             // username이 중복될때
             EnumDto ValidationEnumDto = new EnumDto(StatusEnum.BAD_REQUEST,"중복된 유저가 있습니다.");
@@ -58,4 +64,27 @@ public class UserService {
         return new ResponseEntity(enumDto,HttpStatus.OK);
     }
 
+    public ResponseEntity userLogin(LoginRequestDto requestDto, HttpServletResponse res ) {
+//        - username, password를 Client에서 전달받기
+        String username = requestDto.getUsername();
+        String password = requestDto.getPassword();
+//        - DB에서 username을 사용하여 저장된 회원의 유무를 확인하고 있다면 password 비교하기
+        // 사용자 확인
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new IllegalArgumentException("들록된 사용자가 없습니다.")
+        );
+
+        // 비밀번호 확인
+        if(!passwordEncoder.matches(password, user.getPassword())){
+            throw new IllegalArgumentException("비밀번호가 일지하지 않습니다.");
+        }
+//        - 로그인 성공 시, 로그인에 성공한 유저의 정보와 JWT를 활용하여 토큰을 발급하고,
+//          발급한 토큰을 Header에 추가하고
+        String token = jwtUtil.createToken(user.getUsername());
+        jwtUtil.addJwtToCookie(token, res);
+
+       // 성공했다는 메시지, 상태코드 와 함께 Client에 반환하기
+        EnumDto enumDto = new EnumDto(StatusEnum.OK,"로그인 성공");
+        return new ResponseEntity(enumDto,HttpStatus.OK);
+    }
 }
