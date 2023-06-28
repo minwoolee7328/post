@@ -1,5 +1,7 @@
 package com.example.post.service;
 
+import com.example.post.comment.entity.Comment;
+import com.example.post.comment.repository.CommentRepository;
 import com.example.post.dto.PostRequestDto;
 import com.example.post.dto.PostResponseDto;
 import com.example.post.entity.Post;
@@ -7,6 +9,7 @@ import com.example.post.repository.PostRepository;
 import com.example.post.user.dto.EnumDto;
 import com.example.post.user.entity.StatusEnum;
 import com.example.post.user.entity.User;
+import com.example.post.user.entity.UserRoleEnum;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
@@ -20,9 +23,10 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
-
-    public PostService(PostRepository postRepository) {
+    private final CommentRepository commentRepository;
+    public PostService(PostRepository postRepository, CommentRepository commentRepository) {
         this.postRepository = postRepository;
+        this.commentRepository = commentRepository;
     }
     //게시글 생성
     public PostResponseDto createPost(PostRequestDto RequestDto, HttpServletRequest req) {
@@ -42,8 +46,15 @@ public class PostService {
     public List<PostResponseDto> getPosts(){
         List<Post> getPost = postRepository.findAllByOrderByCreatedAtDesc();
         List<PostResponseDto> showPosts = new ArrayList<>();
+        List<String> comments = new ArrayList<>();
+
         for(Post post : getPost){
-            showPosts.add(new PostResponseDto(post));
+            List<Comment> commentsList = post.getCommentList();
+
+            for( Comment comment :commentsList){
+                comments.add(comment.getComment());
+            }
+            showPosts.add(new PostResponseDto(post,comments));
         }
         return showPosts;
     }
@@ -53,7 +64,14 @@ public class PostService {
 
         Post post = findPost(id);
 
-        return new PostResponseDto(post);
+        List<String> comments = new ArrayList<>();
+        List<Comment> commentsList = post.getCommentList();
+
+        for( Comment comment :commentsList){
+            comments.add(comment.getComment());
+        }
+
+        return new PostResponseDto(post,comments);
 
     }
     //게시글 수정
@@ -63,7 +81,7 @@ public class PostService {
         Post post = findPost(id);
 
         // 해당글의 작성자 와 토큰의 사용자가 같으면 업데이트
-        if(post.getUser().getUsername().equals(user.getUsername())){
+        if(post.getUser().getUsername().equals(user.getUsername())|| user.getRole().equals(UserRoleEnum.ADMIN)){
             post.update(requestDto);
             return new PostResponseDto(post);
         }else {
@@ -72,12 +90,20 @@ public class PostService {
 
     }
 
-    public ResponseEntity deletePost(Long id, PostRequestDto requestDto, HttpServletRequest req) {
+    public ResponseEntity deletePost(Long id, HttpServletRequest req) {
         User user = (User) req.getAttribute("user");
         Post post = findPost(id);
 
-        // 해당글의 작성자 와 토큰의 사용자가 같으면 삭제
-        if(post.getUser().getUsername().equals(user.getUsername())){
+       //  해당글의 작성자 와 토큰의 사용자가 같으면 삭제
+        if(post.getUser().getUsername().equals(user.getUsername())|| user.getRole().equals(UserRoleEnum.ADMIN)){
+
+            // 선택한 게시글의 댓글을 먼저 삭제
+            List<Comment> commentsList = post.getCommentList();
+            for( Comment comment :commentsList){
+                System.out.println("comment = " + comment);
+                commentRepository.delete(comment);
+            }
+
             postRepository.delete(post);
             EnumDto SuccessEnumDto = new EnumDto(StatusEnum.OK,"삭제가 완료되었습니다.");
             return new ResponseEntity(SuccessEnumDto, HttpStatus.OK);
@@ -85,6 +111,7 @@ public class PostService {
             EnumDto SuccessEnumDto = new EnumDto(StatusEnum.BAD_REQUEST,"작성자가 다릅니다.");
             return new ResponseEntity(SuccessEnumDto, HttpStatus.BAD_REQUEST);
         }
+
     }
 
     private Post findPost(Long id){

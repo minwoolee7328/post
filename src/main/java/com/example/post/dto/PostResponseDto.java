@@ -1,10 +1,12 @@
 package com.example.post.dto;
 
+import com.example.post.comment.entity.Comment;
 import com.example.post.entity.Post;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -14,12 +16,21 @@ public class PostResponseDto {
     private String content;
     private String writer;
     private LocalDateTime createdAt;
+    private String commentList;
 
     public PostResponseDto(Post post) {
         this.title = post.getTitle();
         this.content = post.getContent();
         this.writer = post.getUser().getUsername();
         this.createdAt = post.getCreatedAt();
+    }
+
+    public PostResponseDto(Post post,List<String> comments) {
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.writer = post.getUser().getUsername();
+        this.createdAt = post.getCreatedAt();
+        this.commentList = comments.toString();
     }
 
     public PostResponseDto(boolean success){

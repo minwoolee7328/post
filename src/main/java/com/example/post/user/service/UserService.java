@@ -8,12 +8,14 @@ import com.example.post.user.dto.LoginRequestDto;
 import com.example.post.user.dto.SignupRequestDto;
 import com.example.post.user.entity.StatusEnum;
 import com.example.post.user.entity.User;
+import com.example.post.user.entity.UserRoleEnum;
 import com.example.post.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
@@ -33,6 +35,8 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
     }
+
+    private final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
 
     public ResponseEntity UserSignUp(SignupRequestDto requestDto, BindingResult bindingResult) {
         // Validation 예외처리
@@ -55,8 +59,17 @@ public class UserService {
             return new ResponseEntity(ValidationEnumDto, HttpStatus.BAD_REQUEST);
         }
 
+        // 사용자 ROLE 확인
+        UserRoleEnum role = UserRoleEnum.USER;
+        if (StringUtils.hasText(requestDto.getAdminToken())) {
+            if (!ADMIN_TOKEN.equals(requestDto.getAdminToken())) {
+                throw new IllegalArgumentException("관리자 암호가 틀려 등록이 불가능합니다.");
+            }
+            role = UserRoleEnum.ADMIN;
+        }
+
         // 중복이 없을때 저장
-        User userData = new User(username, password);
+        User userData = new User(username, password, role);
         userRepository.save(userData);
 
         // 표현식에 맞게 입력하고 중복된 username도 없을때 status 200 / success
@@ -80,7 +93,7 @@ public class UserService {
         }
 //        - 로그인 성공 시, 로그인에 성공한 유저의 정보와 JWT를 활용하여 토큰을 발급하고,
 //          발급한 토큰을 Header에 추가하고
-        String token = jwtUtil.createToken(user.getUsername());
+        String token = jwtUtil.createToken(user.getUsername(),user.getRole());
         jwtUtil.addJwtToCookie(token, res);
 
        // 성공했다는 메시지, 상태코드 와 함께 Client에 반환하기

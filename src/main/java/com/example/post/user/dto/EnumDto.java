@@ -10,7 +10,7 @@ public class EnumDto {
     private String message;
 
     public EnumDto(StatusEnum status, String message) {
-        this.status = status.getAuthority();
+        this.status = status.getStatus();
         this.message =message;
     }
 

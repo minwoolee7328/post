@@ -1,5 +1,6 @@
 package com.example.post.entity;
 
+import com.example.post.comment.entity.Comment;
 import com.example.post.dto.PostRequestDto;
 import com.example.post.user.entity.User;
 import jakarta.persistence.*;
@@ -7,6 +8,9 @@ import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,6 +31,9 @@ public class Post extends Timestamped{
     @ManyToOne
     @JoinColumn(name = "username")
     private User user;
+
+    @OneToMany(mappedBy = "post")
+    private List<Comment> commentList = new ArrayList<>();
 
     public Post(PostRequestDto postRequestDto,User user) {
         this.title = postRequestDto.getTitle();

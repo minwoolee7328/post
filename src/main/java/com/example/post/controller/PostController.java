@@ -45,8 +45,8 @@ public class PostController {
 
     //게시물 삭제
     @DeleteMapping("/postNumber/{id}")
-    public ResponseEntity deletePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto, HttpServletRequest req){
-        return postService.deletePost(id,requestDto,req);
+    public ResponseEntity deletePost(@PathVariable Long id, HttpServletRequest req){
+        return postService.deletePost(id,req);
 
     }
 
