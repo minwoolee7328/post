@@ -15,6 +15,7 @@ public class PostResponseDto {
     private String title;
     private String content;
     private String writer;
+    private int likeNumber;
     private LocalDateTime createdAt;
     private String commentList;
 
@@ -25,12 +26,13 @@ public class PostResponseDto {
         this.createdAt = post.getCreatedAt();
     }
 
-    public PostResponseDto(Post post,List<String> comments) {
+    public PostResponseDto(Post post, List<String> comments, int likeNumber) {
         this.title = post.getTitle();
         this.content = post.getContent();
         this.writer = post.getUser().getUsername();
         this.createdAt = post.getCreatedAt();
         this.commentList = comments.toString();
+        this.likeNumber = likeNumber;
     }
 
     public PostResponseDto(boolean success){

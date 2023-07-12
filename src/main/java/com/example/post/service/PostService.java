@@ -5,13 +5,14 @@ import com.example.post.comment.repository.CommentRepository;
 import com.example.post.dto.PostRequestDto;
 import com.example.post.dto.PostResponseDto;
 import com.example.post.entity.Post;
+import com.example.post.like.entity.postLike;
+import com.example.post.like.repository.likeRepository;
 import com.example.post.repository.PostRepository;
 import com.example.post.security.UserDetailsImpl;
 import com.example.post.user.dto.EnumDto;
 import com.example.post.user.entity.StatusEnum;
 import com.example.post.user.entity.User;
 import com.example.post.user.entity.UserRoleEnum;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,15 +20,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PostService {
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    public PostService(PostRepository postRepository, CommentRepository commentRepository) {
+
+    private final likeRepository likeRepository;
+    public PostService(PostRepository postRepository, CommentRepository commentRepository, com.example.post.like.repository.likeRepository likeRepository) {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
+        this.likeRepository = likeRepository;
     }
     //게시글 생성
     public PostResponseDto createPost(PostRequestDto RequestDto, UserDetailsImpl userDetails) {
@@ -56,7 +61,9 @@ public class PostService {
             for( Comment comment :commentsList){
                 comments.add(comment.getComment());
             }
-            showPosts.add(new PostResponseDto(post,comments));
+
+            int likeNumber = likeRepository.findByPost_id(post.getId()).size();
+            showPosts.add(new PostResponseDto(post,comments,likeNumber));
         }
         return showPosts;
     }
@@ -73,7 +80,7 @@ public class PostService {
             comments.add(comment.getComment());
         }
 
-        return new PostResponseDto(post,comments);
+        return new PostResponseDto(post,comments,0);
 
     }
     //게시글 수정
