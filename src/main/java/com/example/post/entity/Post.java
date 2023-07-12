@@ -28,8 +28,6 @@ public class Post extends Timestamped{
     @Column(name = "content", nullable = false, length = 500)
     private String content;
 
-    @Column(name = "likeNumber")
-    private int likeNumber;
 
     @ManyToOne
     @JoinColumn(name = "username")
@@ -38,8 +36,7 @@ public class Post extends Timestamped{
     @OneToMany(mappedBy = "post")
     private List<Comment> commentList = new ArrayList<>();
 
-    public Post(PostRequestDto postRequestDto,User user) {
-        this.likeNumber = 0;
+    public Post(PostRequestDto postRequestDto,User user){
         this.title = postRequestDto.getTitle();
         this.content = postRequestDto.getContent();
         this.user = user;

@@ -1,11 +1,12 @@
 package com.example.post.service;
 
+import com.example.post.comment.dto.CommentResponseDto;
 import com.example.post.comment.entity.Comment;
 import com.example.post.comment.repository.CommentRepository;
+import com.example.post.commentLike.repository.CommentLikeRepository;
 import com.example.post.dto.PostRequestDto;
 import com.example.post.dto.PostResponseDto;
 import com.example.post.entity.Post;
-import com.example.post.like.entity.postLike;
 import com.example.post.like.repository.likeRepository;
 import com.example.post.repository.PostRepository;
 import com.example.post.security.UserDetailsImpl;
@@ -20,19 +21,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PostService {
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-
     private final likeRepository likeRepository;
-    public PostService(PostRepository postRepository, CommentRepository commentRepository, com.example.post.like.repository.likeRepository likeRepository) {
+    private final CommentLikeRepository commentLikeRepository;
+    public PostService(PostRepository postRepository, CommentRepository commentRepository, com.example.post.like.repository.likeRepository likeRepository, CommentLikeRepository commentLikeRepository) {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
         this.likeRepository = likeRepository;
+        this.commentLikeRepository = commentLikeRepository;
     }
     //게시글 생성
     public PostResponseDto createPost(PostRequestDto RequestDto, UserDetailsImpl userDetails) {
@@ -53,16 +54,22 @@ public class PostService {
     public List<PostResponseDto> getPosts(){
         List<Post> getPost = postRepository.findAllByOrderByCreatedAtDesc();
         List<PostResponseDto> showPosts = new ArrayList<>();
-        List<String> comments = new ArrayList<>();
+
+        System.out.println("getPost.get(0).getCommentList().get(0).getId() = " + getPost.get(1).getCommentList().get(0).getComment());
 
         for(Post post : getPost){
             List<Comment> commentsList = post.getCommentList();
+            List<CommentResponseDto> comments = new ArrayList<>();
 
             for( Comment comment :commentsList){
-                comments.add(comment.getComment());
-            }
+                System.out.println("commentLikeRepository.findByComment_id(comment.getId()) = " + commentLikeRepository.findByComment_idAndLikechek(comment.getId(),true).size());
 
-            int likeNumber = likeRepository.findByPost_id(post.getId()).size();
+                //댓글을 좋아요 숫자와 함께 출력
+                comments.add(new CommentResponseDto(comment,commentLikeRepository.findByComment_idAndLikechek(comment.getId(),true).size()));
+            }
+            // 해당 게시글의 좋아요 개수를 넣어준다.
+            int likeNumber = likeRepository.findByPost_idAndLikechek(post.getId(),true).size();
+
             showPosts.add(new PostResponseDto(post,comments,likeNumber));
         }
         return showPosts;
@@ -73,11 +80,11 @@ public class PostService {
 
         Post post = findPost(id);
 
-        List<String> comments = new ArrayList<>();
+        List<CommentResponseDto> comments = new ArrayList<>();
         List<Comment> commentsList = post.getCommentList();
 
         for( Comment comment :commentsList){
-            comments.add(comment.getComment());
+            comments.add(new CommentResponseDto(comment,0));
         }
 
         return new PostResponseDto(post,comments,0);

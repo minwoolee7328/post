@@ -42,11 +42,11 @@ public class likeService {
             // 해당 게시글의 좋아요 수 증가
 
 
-            return postLike.isLikeChek();
+            return postLike.isLikechek();
         }
 
         //데이터가 있으면 종아요를 클릭했는지 안했는지를 ture/false로 반환
-        return likeCheck.get().isLikeChek();
+        return likeCheck.get().isLikechek();
 
     }
 
@@ -59,19 +59,19 @@ public class likeService {
         // 토큰에 저장된 해당 유저의 데이터를 찾는다
         Optional<postLike> likeCheck = likeRepository.findByPost_idAndUser_id(post.getId(), user.getId());
 
-        if(likeCheck.get().isLikeChek()){
+        if(likeCheck.get().isLikechek()){
             // ture인 상태
-            likeCheck.get().setLikeChek(false);
+            likeCheck.get().setLikechek(false);
 
             likeRepository.save(likeCheck.get());
         }else{
             // false인 상태
-            likeCheck.get().setLikeChek(true);
+            likeCheck.get().setLikechek(true);
 
             likeRepository.save(likeCheck.get());
         }
 
-        return likeCheck.get().isLikeChek();
+        return likeCheck.get().isLikechek();
     }
 
     private Post findPost(Long id){

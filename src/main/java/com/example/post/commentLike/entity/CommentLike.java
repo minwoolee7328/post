@@ -1,23 +1,23 @@
-package com.example.post.like.entity;
+package com.example.post.commentLike.entity;
 
-import com.example.post.entity.Post;
+import com.example.post.comment.entity.Comment;
 import com.example.post.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 @Entity
 @Getter
 @Setter
-@Table(name = "postlike")
+@Table(name = "commentLike")
 @NoArgsConstructor
-public class postLike {
+public class CommentLike {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="likechek", nullable = false)
+    @Column(name="likeChek", nullable = false)
     private boolean likechek;
 
     @ManyToOne
@@ -25,13 +25,13 @@ public class postLike {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name ="post_id")
-    private Post post;
+    @JoinColumn(name ="comment_id")
+    private Comment comment;
 
-    public postLike(User user, Post post){
+    public CommentLike(User user, Comment comment){
         this.likechek = true;
         this.user = user;
-        this.post = post;
+        this.comment = comment;
     }
 
 }

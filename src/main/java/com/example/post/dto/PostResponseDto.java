@@ -1,6 +1,6 @@
 package com.example.post.dto;
 
-import com.example.post.comment.entity.Comment;
+import com.example.post.comment.dto.CommentResponseDto;
 import com.example.post.entity.Post;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
@@ -17,7 +17,7 @@ public class PostResponseDto {
     private String writer;
     private int likeNumber;
     private LocalDateTime createdAt;
-    private String commentList;
+    private List<CommentResponseDto> commentList;
 
     public PostResponseDto(Post post) {
         this.title = post.getTitle();
@@ -26,12 +26,12 @@ public class PostResponseDto {
         this.createdAt = post.getCreatedAt();
     }
 
-    public PostResponseDto(Post post, List<String> comments, int likeNumber) {
+    public PostResponseDto(Post post, List<CommentResponseDto> comments, int likeNumber) {
         this.title = post.getTitle();
         this.content = post.getContent();
         this.writer = post.getUser().getUsername();
         this.createdAt = post.getCreatedAt();
-        this.commentList = comments.toString();
+        this.commentList = comments;
         this.likeNumber = likeNumber;
     }
 
