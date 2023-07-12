@@ -84,10 +84,12 @@ public class PostService {
         List<Comment> commentsList = post.getCommentList();
 
         for( Comment comment :commentsList){
-            comments.add(new CommentResponseDto(comment,0));
+            comments.add(new CommentResponseDto(comment,commentLikeRepository.findByComment_idAndLikechek(comment.getId(),true).size()));
         }
 
-        return new PostResponseDto(post,comments,0);
+        int likeNumber = likeRepository.findByPost_idAndLikechek(post.getId(),true).size();
+
+        return new PostResponseDto(post,comments,likeNumber);
 
     }
     //게시글 수정
