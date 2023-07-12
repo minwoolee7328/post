@@ -11,6 +11,7 @@ import com.example.post.user.entity.User;
 import com.example.post.user.entity.UserRoleEnum;
 import com.example.post.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,7 @@ import org.springframework.validation.FieldError;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class UserService {
 
@@ -42,6 +44,11 @@ public class UserService {
         // Validation 예외처리
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
         if(fieldErrors.size() > 0) {
+            for(FieldError fieldError : bindingResult.getFieldErrors())
+            {
+                log.error(fieldError.getField() + "필드 :" + fieldError.getDefaultMessage());
+            }
+
             // 표현식과 다르게 입력했을때 status 400 / false
             EnumDto ValidationEnumDto = new EnumDto(StatusEnum.BAD_REQUEST,"잘못 입력하셨습니다.");
             return new ResponseEntity(ValidationEnumDto, HttpStatus.BAD_REQUEST);
@@ -91,8 +98,7 @@ public class UserService {
         if(!passwordEncoder.matches(password, user.getPassword())){
             throw new IllegalArgumentException("비밀번호가 일지하지 않습니다.");
         }
-//        - 로그인 성공 시, 로그인에 성공한 유저의 정보와 JWT를 활용하여 토큰을 발급하고,
-//          발급한 토큰을 Header에 추가하고
+//        - 로그인 성공 시, 로그인에 성공한 유저의 정보와 JWT를 활용하여 토큰을 발급
         String token = jwtUtil.createToken(user.getUsername(),user.getRole());
         jwtUtil.addJwtToCookie(token, res);
 

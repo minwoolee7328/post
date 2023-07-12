@@ -3,9 +3,11 @@ package com.example.post.controller;
 import com.example.post.dto.PostRequestDto;
 import com.example.post.dto.PostResponseDto;
 
+import com.example.post.security.UserDetailsImpl;
 import com.example.post.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,8 +23,8 @@ public class PostController {
 
     // 게시물 생성 api
     @PostMapping("/posts")
-    public PostResponseDto createPost(@RequestBody PostRequestDto RequestDto, HttpServletRequest req){
-        return postService.createPost(RequestDto, req);
+    public PostResponseDto createPost(@RequestBody PostRequestDto RequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return postService.createPost(RequestDto,userDetails);
     }
 
     //게시물 전체 조회 api
@@ -39,14 +41,14 @@ public class PostController {
 
      //게시물 수정
     @PutMapping("/postNumber/{id}")
-    public PostResponseDto updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto, HttpServletRequest req){
-        return postService.updatePost(id,requestDto,req);
+    public PostResponseDto updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return postService.updatePost(id,requestDto,userDetails);
     }
 
     //게시물 삭제
     @DeleteMapping("/postNumber/{id}")
-    public ResponseEntity deletePost(@PathVariable Long id, HttpServletRequest req){
-        return postService.deletePost(id,req);
+    public ResponseEntity deletePost(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return postService.deletePost(id,userDetails);
 
     }
 

@@ -6,6 +6,7 @@ import com.example.post.dto.PostRequestDto;
 import com.example.post.dto.PostResponseDto;
 import com.example.post.entity.Post;
 import com.example.post.repository.PostRepository;
+import com.example.post.security.UserDetailsImpl;
 import com.example.post.user.dto.EnumDto;
 import com.example.post.user.entity.StatusEnum;
 import com.example.post.user.entity.User;
@@ -29,8 +30,9 @@ public class PostService {
         this.commentRepository = commentRepository;
     }
     //게시글 생성
-    public PostResponseDto createPost(PostRequestDto RequestDto, HttpServletRequest req) {
-        User user = (User) req.getAttribute("user");
+    public PostResponseDto createPost(PostRequestDto RequestDto, UserDetailsImpl userDetails) {
+
+        User user = userDetails.getUser();
 
         Post post = new Post(RequestDto,user);
 
@@ -76,8 +78,8 @@ public class PostService {
     }
     //게시글 수정
     @Transactional
-    public PostResponseDto updatePost(Long id, PostRequestDto requestDto, HttpServletRequest req) {
-        User user = (User) req.getAttribute("user");
+    public PostResponseDto updatePost(Long id, PostRequestDto requestDto, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
         Post post = findPost(id);
 
         // 해당글의 작성자 와 토큰의 사용자가 같으면 업데이트
@@ -90,8 +92,8 @@ public class PostService {
 
     }
 
-    public ResponseEntity deletePost(Long id, HttpServletRequest req) {
-        User user = (User) req.getAttribute("user");
+    public ResponseEntity deletePost(Long id, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
         Post post = findPost(id);
 
        //  해당글의 작성자 와 토큰의 사용자가 같으면 삭제

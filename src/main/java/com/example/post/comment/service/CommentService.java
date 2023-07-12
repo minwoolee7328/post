@@ -6,6 +6,7 @@ import com.example.post.comment.entity.Comment;
 import com.example.post.comment.repository.CommentRepository;
 import com.example.post.entity.Post;
 import com.example.post.repository.PostRepository;
+import com.example.post.security.UserDetailsImpl;
 import com.example.post.user.dto.EnumDto;
 import com.example.post.user.entity.StatusEnum;
 import com.example.post.user.entity.User;
@@ -27,8 +28,8 @@ public class CommentService {
         this.postRepository = postRepository;
     }
 
-    public CommentResponseDto createComment(CommentRequestDto requestDto, HttpServletRequest req) {
-        User user = (User) req.getAttribute("user");
+    public CommentResponseDto createComment(CommentRequestDto requestDto, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
         Post post = findPost(requestDto.getId());
 
         Comment comment = new Comment(requestDto,post,user);
@@ -37,8 +38,8 @@ public class CommentService {
         return new CommentResponseDto(comment);
     }
     @Transactional
-    public CommentResponseDto updateCommemt(Long id, CommentRequestDto requestDto, HttpServletRequest req) {
-        User user = (User) req.getAttribute("user");
+    public CommentResponseDto updateCommemt(Long id, CommentRequestDto requestDto, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
 
         Comment findComment = findComment(id);
 
@@ -52,8 +53,8 @@ public class CommentService {
 
     }
 
-    public ResponseEntity deleteComment(Long id, HttpServletRequest req) {
-        User user = (User) req.getAttribute("user");
+    public ResponseEntity deleteComment(Long id, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
 
         Comment findComment = findComment(id);
 
