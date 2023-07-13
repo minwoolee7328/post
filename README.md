@@ -8,5 +8,3 @@
 https://ruby-pear-718.notion.site/98435aa4e567407ea769708ba20af6b7?v=a15537f12daf44ed89af417f5f3fee9e&pvs=4
 
 
-
-
