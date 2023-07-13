@@ -26,10 +26,4 @@ public class UserController {
        return userService.UserSignUp(requestDto,bindingResult);
     }
 
-    @PostMapping("/user/login")
-    public ResponseEntity UserLogin(@RequestBody LoginRequestDto requestDto, HttpServletResponse res){
-        return userService.userLogin(requestDto ,res);
-    }
-
-
 }
